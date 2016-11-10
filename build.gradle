@@ -25,8 +25,11 @@ publishing {
 publishing {
     repositories {
         maven {
-            // Change to a proper mvn repository
-            url "$buildDir/repo"
+            url 'http://jenkins.rsk.co/artifactory/libs-release-local'
+            credentials {
+                username = "$mavenUser"
+                password = "$mavenPassword"
+            }
         }
     }
 }
