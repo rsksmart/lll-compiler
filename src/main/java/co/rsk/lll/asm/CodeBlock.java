@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static co.rsk.lll.asm.OpCode.PUSH1;
+
 /**
  * Created by Sergio on 25/10/2016.
  */
@@ -29,6 +31,52 @@ public class CodeBlock {
     public void addTag(int position,int id) {
         CodeTag c = new CodeTag(position,id);
         tags.add(c);
+    }
+
+    public String getSourceRefText(int pos, int[] fromIndexVec) {
+        int fromIndex =0;
+        if (fromIndexVec!=null)
+            fromIndex = fromIndexVec[0];
+         for(int i=fromIndex;i<refs.size();i++) {
+            SourceRef ref = refs.get(i);
+
+             if (ref.position==pos) {
+                 if (fromIndexVec != null)
+                     fromIndexVec[0] = i + 1;
+                 return ref.source.substring(ref.startChar, ref.startChar + ref.length);
+             }
+
+             if (ref.position<pos)
+                 if (fromIndexVec!=null)
+                     fromIndexVec[0] = i+1;
+         }
+        return null;
+    }
+
+    public int getTagIdByPos(int pos, int[] fromIndexVec) {
+        int fromIndex =0;
+        if (fromIndexVec!=null)
+            fromIndex = fromIndexVec[0];
+
+        for(int i=fromIndex;i<tags.size();i++) {
+            CodeTag tag = tags.get(i);
+            if (tag.position==pos) {
+                if (fromIndexVec!=null)
+                    fromIndexVec[0] = i+1;
+                return tag.id;
+            }
+
+            if (tag.position<pos)
+                if (fromIndexVec!=null)
+                    fromIndexVec[0] = i+1;
+
+        }
+        return -1;
+    }
+
+    public void addSourceRef(int position,int startChar,int length,String source) {
+        SourceRef c = new SourceRef(position,startChar,length,source);
+        refs.add(c);
     }
 
     public byte[] getCode() {
@@ -61,18 +109,18 @@ public class CodeBlock {
 
 
     public void writePushLabelRef() {
-        int pushOpcode = 4 + OpCode.PUSH1.val() - 1; // four bytes ref
+        int pushOpcode = 4 + PUSH1.val() - 1; // four bytes ref
         bOut.write(pushOpcode);
         writeLabelRef();
     }
 
     public void writePushByte(int b) {
-        int pushOpcode = OpCode.PUSH1.val() ;
+        int pushOpcode = PUSH1.val() ;
         bOut.write(pushOpcode);
         bOut.write(b);
     }
     public void writePushInt(int i) {
-        int pushOpcode = OpCode.PUSH1.val()+3;
+        int pushOpcode = PUSH1.val()+3;
         bOut.write(pushOpcode);
         bOut.write( (i>>24) & 0xff);
         bOut.write( (i>>16) & 0xff);

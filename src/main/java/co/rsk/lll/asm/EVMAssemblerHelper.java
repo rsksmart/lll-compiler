@@ -11,6 +11,34 @@ public class EVMAssemblerHelper {
     int tagIdCount;
     List<Label> labels = new ArrayList<>();
 
+    public EVMAssemblerHelper() {
+
+    }
+
+    public String getLabelName(int id) {
+     Label lab = labels.get(id);
+     return lab.name;
+    }
+
+    public int findLabelByPos(int pos) {
+        int startIndex =0;
+
+        for (int i=startIndex;i<labels.size();i++) {
+            if  (labels.get(i).offset==pos) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public int findLabel(String name) {
+      for (int i=0;i<labels.size();i++) {
+          if  (labels.get(i).name.equalsIgnoreCase(name)) {
+              return i;
+          }
+      }return -1;
+    }
+
     public void moveLabels(CodeBlock from, CodeBlock to, int len) {
         for (int i=0;i<labels.size();i++) {
             Label label =labels.get(i);
